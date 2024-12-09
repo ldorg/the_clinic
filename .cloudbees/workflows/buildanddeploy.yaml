@@ -74,6 +74,7 @@ jobs:
         uses: docker://gcr.io/core-workshop/launchable-action:0.2.0
         env:
           LAUNCHABLE_TOKEN: ${{ secrets.LAUNCHABLE_TOKEN }}
+        if: always()
         run: |
           launchable record build --name ${{ cloudbees.run_id }} --source src=.
           launchable record tests --test-suite "mvn tests" --build ${{ cloudbees.run_id }} maven "./**/target/surefire-reports"
