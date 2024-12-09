@@ -46,7 +46,7 @@ jobs:
             - **JIRA Issue Key:** "${{ steps.commitinfo.outputs.jira_key }}"
             ## Commit Information
             - **Commit ID:** "${{ steps.commitinfo.outputs.commit_id }}"
-            - **Commit Message:** "${{ steps.commitinfo.outputs.commit_msg }}" 
+            - **Commit Message:** "${{ steps.commitinfo.outputs.commit_msg }}"
           format: MARKDOWN
   unit-tests:
     outputs:
@@ -66,6 +66,12 @@ jobs:
         with:
           test-type: JUnit
           folder-name: /cloudbees/workspace/target/surefire-reports/*.xml
+      - name: Push results to launchable
+        uses: docker://gcr.io/core-workshop/launchable-action:0.1.0
+        env:
+          LAUNCHABLE_TOKEN: ${{ secrets.LAUNCHABLE_TOKEN }}
+        run: |
+          launchable record tests --no-build maven "./**/target/surefire-reports"
       - name: Publish evidence
         uses: cloudbees-io/publish-evidence-item@v1
         with:
@@ -73,7 +79,7 @@ jobs:
             ## Unit Test Results
             - **Unit Test Results:** "${{ steps.RunUnitTest.outputs.mvn_test_stdio1 }}"
             ## Code Coverage Report
-            ${{vars.PETCLINIC_UT_RESULTS}} 
+            ${{vars.PETCLINIC_UT_RESULTS}}
           format: MARKDOWN
     needs:
       - evidence-collection
@@ -197,9 +203,9 @@ jobs:
         uses: cloudbees-io/publish-evidence-item@v1
         with:
           content: |-
-            ${{vars.PETCLINIC_SCA_SCAN_RESULTS}} 
-          format: MARKDOWN                  
-    needs: 
+            ${{vars.PETCLINIC_SCA_SCAN_RESULTS}}
+          format: MARKDOWN
+    needs:
       - evidence-collection
   exit_gate:
     environment: ldonley_dev
@@ -209,13 +215,13 @@ jobs:
         with:
           content: |-
             ## Exit Gates Results
-            ${{vars.PETCLINIC_DEV_EXIT_GATE}} 
+            ${{vars.PETCLINIC_DEV_EXIT_GATE}}
           format: MARKDOWN
       - uses: docker://maven:3-eclipse-temurin-17
         name: Manual Approval
         run: |
           echo "Manual approval required before proceeding to deployment."
-    needs: 
+    needs:
       - deploy_dev
   smokeTest_dev:
     steps:
@@ -230,7 +236,7 @@ jobs:
         with:
           content: "${{vars.PETCLINIC_SMOKETEST_DEV_RESULTS}} "
           format: MARKDOWN
-    needs: 
+    needs:
       - deploy_dev
   deploy_dev:
     environment: ldonley_dev
@@ -296,7 +302,7 @@ jobs:
 
             Running spring-petclinic:${{ cloudbees.scm.sha }}
           format: MARKDOWN
-    needs: 
+    needs:
       - exit_gate
   smokeTest_qa:
     steps:
@@ -311,7 +317,7 @@ jobs:
         with:
           content: "${{vars.PETCLINIC_SMOKETEST_QA_RESULTS}} "
           format: MARKDOWN
-    needs: 
+    needs:
       - deploy_qa
   deploy_prod:
     environment: ldonley_prod
@@ -344,7 +350,7 @@ jobs:
 
             Running spring-petclinic:${{ cloudbees.scm.sha }}
           format: MARKDOWN
-    needs: 
+    needs:
       - deploy_qa
   smokeTest_prod:
     steps:
@@ -359,5 +365,5 @@ jobs:
         with:
           content: "${{vars.PETCLINIC_SMOKETEST_PROD_RESULTS}} "
           format: MARKDOWN
-    needs: 
+    needs:
       - deploy_prod
