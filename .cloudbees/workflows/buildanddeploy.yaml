@@ -71,7 +71,8 @@ jobs:
         env:
           LAUNCHABLE_TOKEN: ${{ secrets.LAUNCHABLE_TOKEN }}
         run: |
-          launchable record tests --no-build maven "./**/target/surefire-reports"
+          launchable record build --name ${{ cloudbees.run_id }} --source src=.
+          launchable record tests --build ${{ cloudbees.run_id }} maven "./**/target/surefire-reports"
       - name: Publish evidence
         uses: cloudbees-io/publish-evidence-item@v1
         with:
