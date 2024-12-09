@@ -67,7 +67,7 @@ jobs:
           test-type: JUnit
           folder-name: /cloudbees/workspace/target/surefire-reports/*.xml
       - name: Push results to launchable
-        uses: docker://gcr.io/core-workshop/launchable-action:0.1.0
+        uses: docker://gcr.io/core-workshop/launchable-action:0.2.0
         env:
           LAUNCHABLE_TOKEN: ${{ secrets.LAUNCHABLE_TOKEN }}
         run: |
